@@ -1,7 +1,7 @@
 'use strict'
 
-function FieldFormatter(_fieldInfo) {
-  this.fieldInfo = _fieldInfo
+function FieldFormatter(fieldInfo) {
+  this.fieldInfo = fieldInfo
 
   this.sqlType = 'TEXT'
 }
