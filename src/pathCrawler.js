@@ -4,7 +4,7 @@ var path = require('path')
 var fs = require('fs')
 var SqlCreator = require('./sqlCreator.js')
 
-async function processDir(startPath, batchSize, fileExt, encoding, createSQLFiles) {
+function searchFiles(startPath, fileExt, dbfFiles) {
   if (!fs.existsSync(startPath)) return
 
   var files = fs.readdirSync(startPath)
@@ -12,15 +12,10 @@ async function processDir(startPath, batchSize, fileExt, encoding, createSQLFile
     var filename = path.join(startPath, files[f])
 
     var stat = fs.lstatSync(filename)
-    if (stat.isDirectory()) {
-      processDirSync(filename, fileExt, encoding, createSQLFiles)
-    } else if (filename.indexOf(fileExt) >= 0) {
-      try {
-        await processFile(filename, fileExt, batchSize, encoding, createSQLFiles)
-      }
-      catch(e) {
-        console.error(e)
-      }
+    if (stat.isDirectory())
+      searchFiles(filename, fileExt, dbfFiles)
+    else if (filename.indexOf(fileExt) >= 0) {
+      dbfFiles.push(filename)
     }
   }
 }
@@ -59,4 +54,12 @@ async function processFile(fileName, fileExt, batchSize, encoding, createSQLFile
   sqlCreator.closeStream()
 }
 
-module.exports = processDir
+async function work(startPath, fileExt, batchSize, encoding, createSQLFiles) {
+  let dbfFiles = []
+
+  searchFiles(startPath, fileExt, dbfFiles)
+  for(let i = 0; i < dbfFiles.length; ++i)
+    await processFile(dbfFiles[i], fileExt, batchSize, encoding, createSQLFiles)
+}
+
+module.exports = work

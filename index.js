@@ -26,7 +26,7 @@ const start = async function() {
     let createSQLFiles = argv.s
     let batchSize = argv.b || 1000
 
-    await pathCrawler(folder, batchSize, fileExt, encoding, createSQLFiles)
+    await pathCrawler(folder, fileExt, batchSize, encoding, createSQLFiles)
   }
 }
 
